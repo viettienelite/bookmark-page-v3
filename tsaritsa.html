@@ -1,0 +1,105 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tsaritsa</title>
+    <link rel="stylesheet" href="chat.css">
+    <link rel="stylesheet" href="navbar.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/streamsaver@2.0.6/StreamSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.1.2/otpauth.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <div class="tab-pill-container">
+        <nav class="tab-pill">
+
+            <div class="tab-pill-indicator"></div>
+
+            <a href="index.html" class="tab-item">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label">Bookmarks</span>
+            </a>
+
+            <a href="2fa.html" class="tab-item">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span class="tab-label">Authenticator</span>
+            </a>
+
+            <a href="tsaritsa.html" class="tab-item active">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                <span class="tab-label">Tsaritsa</span>
+            </a>
+        </nav>
+    </div>
+
+    <div id="chat">
+        <div class="chat-content-area" id="messageList"></div>
+
+        <div id="toast-container"></div>
+
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <div id="loading-text">Loading...</div>
+            <button id="cancel-btn">Cancel</button>
+        </div>
+
+        <div id="drag-overlay">
+            <div class="drag-content">
+                <svg viewBox="0 0 24 24" width="60" height="60" fill="white">
+                    <path
+                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                </svg>
+                <h3>Drop file to send</h3>
+            </div>
+        </div>
+
+        <div class="chat-toolbar">
+            <button class="btn-icon" onclick="document.getElementById('fileInput').click()">
+                <svg viewBox="15 15 70 70">
+                    <rect x="45" y="30" width="10" height="40" rx="4" ry="4" fill="#fff" />
+                    <rect x="30" y="45" width="40" height="10" rx="4" ry="4" fill="#fff" />
+                </svg>
+            </button>
+            <input type="file" id="fileInput" multiple onchange="handleInputFiles(this)" style="display: none;">
+
+            <div class="text-area">
+                <textarea class="text-input" id="textInput" placeholder="Nhập tin nhắn..." rows="1"
+                    oninput="autoResize(this)" onkeydown="handleEnter(event)"></textarea>
+            </div>
+
+            <button class="btn-icon" onclick="sendText()">
+                <svg id="send" viewBox="5 0 190 190">
+                    <path
+                        d="M40,40 C35,50 35,50 45,85 Q50,90 80,93 A7,7 0 0 1 80,107 Q50,110 45,115 C35,150 35,150 40,160 Q45,170 60,163 L160,110 Q170,105 170,100 Q170,95 160,90 L60,37 Q45,30 40,40Z"
+                        fill="#fff" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="media-lightbox" class="lightbox-overlay" onclick="closeLightbox(event)">
+            <button class="lightbox-close" onclick="closeLightbox(event)">×</button>
+            <div class="lightbox-content" onclick="event.stopPropagation()">
+            </div>
+        </div>
+    </div>
+
+    <div class="snow-scene" id="snowScene" aria-hidden="true"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tus-js-client@3.0.0/dist/tus.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tus-js-client/4.1.0/tus.min.js"></script>
+    <script src="chat.js"></script>
+</body>

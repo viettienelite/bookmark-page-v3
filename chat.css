@@ -1,60 +1,55 @@
+body {
+  position: relative;
+  margin: 0;
+  background-color: #F0F4F9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Rubik", sans-serif;
+  z-index: 0;
+  overflow-x: hidden;
+}
 
-#chat {
+.tab-pill-indicator {
   position: absolute;
-  top: 0px;
-  right: 307.5px;
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  background-color: white;
-  backdrop-filter: blur(20px);
-  z-index: 20;
-  transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1);
-  cursor: pointer;
-  overflow: hidden;
-}
-
-#chat:not(.active):hover {
-  background-color: #C2E7FF;
-}
-
-#chat.active {
-  top: 50px;
-  right: -52.5px;
-  width: 900px;
-  height: 600px;
+  width: 110px;
+  height: 38px;
+  left: 350px;
   border-radius: 100px;
-  corner-shape: squircle;
-  backdrop-filter: blur(20px);
-  transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1);
-  cursor: default;
+  background-color: var(--pill-accent);
+  box-shadow: 0px 4px 10px rgba(33, 150, 243, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  view-transition-name: tab-pill-indicator;
 }
 
-#bookmark-container:has(#chat.active) .container {
-  opacity: 0;
-  visibility: hidden;
+/* --- #chat: luôn là giao diện chat full page, không còn trạng thái bong bóng thu/phóng ---
+   Bắt đầu từ top: 90px để không đè lên .tab-pill-container phía trên. */
+#chat {
+  position: fixed;
+  top: 90px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 90px);
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-#bookmark-container:has(#chat.active) #two-fa {
-  opacity: 0;
-  visibility: hidden;
-}
-
-#chat-icon {
+/* Lớp phủ gradient ở đỉnh khung chat: mờ dần từ #f0f4f9 (màu nền trang)
+   xuống trong suốt, tạo cảm giác tin nhắn cũ "tan biến" vào nền trang
+   khi cuộn lên gần sát top thay vì bị cắt cụt đột ngột. */
+#chat::before {
+  content: '';
   position: absolute;
-  top: 17px;
-  left: 15.5px;
-  width: 31px;
-  height: 31px;
-  opacity: 1;
-  visibility: visible;
-  transition: all 0.5s ease;
-  z-index: 5;
-}
-
-#chat.active #chat-icon {
-  opacity: 0;
-  visibility: hidden;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to bottom, #f0f4f9 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 25;
 }
 
 
@@ -74,66 +69,128 @@
 
 
 
-/* --- 3. CHAT LAYOUT --- */
+/* --- 3. CHAT LAYOUT (full page, input bar dính đáy màn hình) --- */
 .chat-content-area {
-  position: absolute;
-  bottom: 80px;
-  left: 100px;
-  width: 700px;
-  height: 520px;
-  padding: 20px 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 972px;
+  margin: 0 auto;
+  padding: 40px 24px 20px 24px;
   box-sizing: border-box;
-  border-bottom-right-radius: 20px;
   overflow-x: visible;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   align-items: flex-end;
   z-index: 10;
+
+  /* Ẩn thanh scrollbar (vẫn cuộn được bình thường bằng chuột/trackpad/chạm) */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE / Edge */
+}
+
+.chat-content-area::before {
+  content: '';
+  position: absolute;
+  bottom: 84px;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to top, #F0F4F9 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 25;
+}
+
+.chat-content-area::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Edge (Chromium) */
 }
 
 .chat-toolbar {
-  position: absolute;
-  width: 700px;
-  bottom: 20px;
-  right: 100px;
-  padding: 10px;
+  position: sticky;
+  flex: 0 0 auto;
+  width: 90%;
+  max-width: 750px;
+  margin: 0 auto 24px auto;
+  padding: 10px 12px 10px 12px;
   box-sizing: border-box;
   display: flex;
   align-items: flex-end;
-  gap: 15px;
-  background: #ECF2FC;
-  /* Tăng độ mờ chút để dễ đọc text */
+  gap: 20px;
+  background: #ffffff;
   border-radius: 30px;
-  /* Giảm radius chút để khi ô to ra không bị xấu */
   z-index: 30;
   transition: all 0.3s ease;
 }
 
+/* Loader nhỏ hiện ở đỉnh danh sách khi đang tải thêm tin nhắn cũ (infinite scroll) */
+#top-loader {
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #d3e3fd;
+  border-top: 3px solid #2c7eea;
+  border-radius: 50%;
+  margin: 4px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  animation: spin 0.6s linear infinite;
+}
+
+#top-loader.active {
+  opacity: 1;
+  visibility: visible;
+}
+
 .chat-toolbar:hover {
-  background: #E8F0FE;
-}
-
-/* 1. Khung chứa tin nhắn gốc của bạn */
-.message-box {
-  position: relative;
-  max-width: 670px;
-  padding: 12px 20px 15px 20px; /* Tăng nhẹ padding trên dưới để Markdown thoáng hơn */
-  box-sizing: border-box;
-  border-radius: 60px;
-  corner-shape: squircle;
   background: #D3E3FD;
-  font-size: 16px;
-  line-height: 1.5;
-  word-wrap: break-word;
-  cursor: pointer;
 }
 
-/* 2. ÉP BUỘC TẤT CẢ TEXT TRONG MESSAGE BOX PHẢI MÀU TRẮNG */
-.message-box, 
-.message-box *, 
-.message-box .text-content *, 
+/* --- ANIMATION: tin nhắn mới trượt lên từ dưới + fade in mượt mà --- */
+/* Vì .chat-content-area là flex-column, khi 1 node mới được append vào cuối,
+   các node phía trên tự động bị "đẩy lên" theo flow layout của trình duyệt;
+   ta chỉ cần animate riêng node mới để nó không "bụp" xuất hiện đột ngột. */
+.message-box.message-enter {
+  opacity: 0;
+  transform: translateY(24px) scale(0.5);
+}
+
+.message-box.message-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Animation khi xóa tin nhắn: thu nhỏ + mờ dần rồi mới biến mất khỏi layout,
+   để các tin nhắn còn lại "trượt" lấp vào chỗ trống một cách mượt mà thay vì giật cục */
+/* Animation khi xóa tin nhắn: thu nhỏ mượt mà từ chiều cao thực về 0 */
+.message-box.message-exit {
+  opacity: 0 !important;
+  transform: translateY(-12px) scale(0.9) !important;
+
+  /* Khóa cứng chiều cao tối đa về 0 */
+  max-height: 0 !important;
+
+  /* Triệt tiêu hoàn toàn padding và margin ngay lập tức để không tạo khoảng trống thừa */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+
+  /* Mẹo cực quan trọng: Biến đổi line-height và border để xóa bỏ hoàn toàn layout ẩn */
+  line-height: 0 !important;
+  border: none !important;
+
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 2. ÉP BUỘC TẤT CẢ TEXT TRONG MESSAGE BOX PHẢI MÀU đen */
+.message-box,
+.message-box *,
+.message-box .text-content *,
 .message-box a {
   color: #000000 !important;
   text-decoration-color: #000000;
@@ -150,9 +207,10 @@
 }
 
 /* Căn chỉnh danh sách (ul, ol) */
-.text-content.markdown-body ul, 
+.text-content.markdown-body ul,
 .text-content.markdown-body ol {
-  padding-left: 25px; /* Để hiện dấu chấm tròn/số */
+  padding-left: 25px;
+  /* Để hiện dấu chấm tròn/số */
   margin: 8px 0;
 }
 
@@ -199,6 +257,7 @@
   padding-left: 15px;
   font-style: italic;
 }
+
 .message-box:hover {
   background: rgba(44, 126, 234, 0.5);
 }
@@ -275,10 +334,61 @@
   display: block;
 }
 
+/* Placeholder thumbnail cho video: mặc định chỉ là khung màu tối + icon Play.
+   Nếu có poster thật (trích khung hình đầu video lúc upload) thì .has-poster sẽ hiện ảnh nền đó.
+   Video full quality thật sự chỉ được nạp khi mở Lightbox. */
+.chat-video-thumb {
+  position: relative;
+  width: 260px;
+  height: 170px;
+  max-width: 350px;
+  max-height: 200px;
+  border-radius: 50px;
+  corner-shape: squircle;
+  background: linear-gradient(135deg, #4a4a4a, #232323);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+  overflow: hidden;
+}
+
+.chat-video-thumb.has-poster {
+  background-size: cover;
+  background-position: center;
+}
+
+/* Phủ tối nhẹ lên poster để icon Play luôn rõ, không lẫn vào ảnh nền sáng màu */
+.chat-video-thumb.has-poster::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.chat-video-thumb:hover {
+  transform: scale(1.02);
+}
+
+.video-play-icon {
+  position: relative;
+  z-index: 1;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .message-box:has(.chat-image),
-.message-box:has(.chat-video) {
+.message-box:has(.chat-video),
+.message-box:has(.chat-video-thumb) {
   padding: 0px;
   background: transparent;
+  overflow: hidden;
 }
 
 .chat-file {
@@ -319,33 +429,83 @@
   font-size: 14px;
 }
 
-.delete-btn {
+/* --- HÀNG CHỨA TIN NHẮN + 2 NÚT HÀNH ĐỘNG NỔI BÊN PHẢI --- */
+/* message-actions dùng position:absolute (right:0), nằm trong phần padding-right đã được
+   .message-row chừa sẵn (xem bên dưới) -> luôn nổi đè lên phía bên phải tin nhắn khi hover,
+   không đẩy message-box hay bất kỳ tin nhắn nào khác dịch chuyển theo. */
+.message-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Chừa sẵn không gian cho 2 nút hành động (34px + 8px gap + 34px + 8px lề) NGAY TRONG
+     box của chính .message-row, thay vì để .message-actions tràn ra ngoài rìa row bằng
+     left:100%. Nhờ đó: (1) vùng hover phủ luôn từ mép trái tin nhắn -> hết mép phải nút
+     Xóa mà không cần thêm phần tử phụ; (2) 2 nút không còn bị .chat-content-area cắt mất,
+     vì giờ chúng nằm BÊN TRONG box của row (row chỉ đơn giản rộng hơn, không tràn ra ngoài). */
+  padding-right: 92px;
+  box-sizing: content-box;
+}
+
+/* Hàng 2 nút tròn (Copy/Tải xuống + Xóa), nổi tuyệt đối bên phải khung chat, chỉ hiện khi hover */
+.message-actions {
   position: absolute;
-  top: -10px;
-  left: -10px;
-  width: 30px;
-  height: 30px;
-  background: #ff7875;
-  color: white !important;
+  top: 0;
+  bottom: 0;
+  right: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.9s ease;
+}
+
+.message-row:hover .message-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.action-btn {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: none;
+  background: rgba(0, 0, 0, 0.35);
   cursor: pointer;
-  opacity: 0;
+  display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 22px;
-  z-index: 5;
-  transition: all 0.3s ease;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.delete-btn:hover {
+.action-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.action-btn:hover {
+  transform: scale(1.08);
+}
+
+.delete-action-btn:hover {
   background: #E73721;
-  rotate: 90deg;
 }
 
-.message-box:hover .delete-btn {
-  opacity: 1;
+.secondary-action-btn:hover {
+  background: #2C7EEA;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .message-actions {
+    transition: none !important;
+  }
+}
+
 
 
 
@@ -390,7 +550,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.97);
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -420,14 +580,14 @@
 #loading-text {
   font-size: 20px;
   font-weight: 600;
-  color: #ffffff;
+  color: #1a1a1a;
   animation: pulse 0.5s infinite;
 }
 
 #cancel-btn {
   padding: 15px 30px;
-  background-color: rgba(255, 255, 255, 0.6);
-  color: #040404;
+  background-color: #ECF2FC;
+  color: #1a1a1a;
   border-radius: 20px;
   border: none;
   font-size: 17px;
@@ -505,4 +665,614 @@
   margin-top: 15px;
   font-family: sans-serif;
   font-weight: 300;
+}
+
+/* --- LIGHTBOX OVERLAY (FULLSCREEN MEDIA) --- */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  /* Đảm bảo nằm trên mọi layer khác */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.lightbox-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 85%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.lightbox-overlay.active .lightbox-content {
+  transform: scale(1);
+}
+
+.lightbox-content img,
+.lightbox-content video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 45px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+  line-height: 1;
+  z-index: 10000;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Tinh chỉnh lại phần Thumbnail trong chat */
+.chat-image,
+.chat-video {
+  cursor: zoom-in;
+  /* Đổi icon chuột thành kính lúp cộng để user biết là click phóng to được */
+  transition: transform 0.2s ease;
+}
+
+.chat-image:hover,
+.chat-video:hover {
+  transform: scale(1.02);
+  /* Hiệu ứng nổi nhẹ khi di chuột vào thumbnail */
+}
+
+/* Ngăn video phát tự động hoặc bấm nhầm nút play của thumbnail gốc */
+.video-wrapper {
+  position: relative;
+}
+
+/* Tạo một lớp phủ trong suốt chặn tương tác trực tiếp vào tag video thumbnail */
+.video-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: zoom-in;
+  z-index: 2;
+}
+
+/* ============================================================
+   PENDING UPLOAD PLACEHOLDER — giữ chỗ trong DOM ngay khi chọn file,
+   hiển thị skeleton/thumb tức thời + vòng tròn xoay đè lên, không có text nào cả.
+   ============================================================ */
+
+/* Khung bọc thumb ảnh/video đang upload, cần relative để chứa overlay tuyệt đối */
+.pending-media-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  border-radius: 50px;
+  corner-shape: squircle;
+  overflow: hidden;
+}
+
+.pending-media-wrap .chat-image {
+  display: block;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Skeleton dùng khi chưa có bất kỳ frame/preview nào (vd video vừa mới chọn, chưa trích khung hình) */
+.upload-skeleton {
+  width: 260px;
+  height: 170px;
+  max-width: 350px;
+  max-height: 200px;
+  background: linear-gradient(100deg, #dde5f3 30%, #eef1f6 45%, #dde5f3 60%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Poster video thật đã trích được (thay cho skeleton), vẫn giữ đúng kích thước khung */
+.pending-video-poster {
+  width: 260px;
+  height: 170px;
+  max-width: 350px;
+  max-height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Lớp phủ chứa vòng tròn tiến độ + nút hủy, đè lên toàn bộ thumb/skeleton trong lúc đang xử lý */
+.upload-progress-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Vòng tròn tiến độ THẬT (không phải spinner xoay vô tận): cung tròn dài dần từ 0 -> 360 độ
+   đúng theo % byte đã upload. Nút hủy (×) luôn nằm CHÍNH GIỮA, bên trong lỗ tròn. */
+.upload-progress-ring-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-progress-ring-wrap svg {
+  width: 100%;
+  height: 100%;
+  /* Xoay -90deg để cung tròn bắt đầu từ vị trí 12h và chạy thuận chiều kim đồng hồ */
+  transform: rotate(-90deg);
+  display: block;
+}
+
+.upload-progress-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 3;
+}
+
+.upload-progress-ring-bar {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  /* stroke-dashoffset được cập nhật bằng JS theo % tiến độ thật, transition để chạy mượt giữa các mốc */
+  transition: stroke-dashoffset 0.15s ease;
+}
+
+.upload-cancel-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.upload-cancel-btn svg {
+  fill: #ffffff;
+  /* Đè lại luật màu chữ đen của message-box */
+  width: 20px;
+  height: 20px;
+  transition: fill 0.2s ease;
+}
+
+.upload-cancel-btn:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.upload-cancel-btn:hover svg {
+  fill: #ff6b57 !important;
+}
+
+/* File thường (không phải ảnh/video) đang chờ upload: vòng tròn tiến độ 55px thay thế HẲN
+   vị trí icon file (icon file thật KHÔNG hiển thị trong lúc đang upload) */
+.chat-file.pending {
+  position: relative;
+  opacity: 0.85;
+}
+
+.file-icon-uploading {
+  flex-shrink: 0;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-box-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+  transition: grid-template-rows 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* --- KHỐI TRUNG GIAN (NƠI CHỨA PADDING VÀ DIỄN RA ANIMATION THU NHỎ) --- */
+.message-grid-inner {
+  min-height: 0;
+  overflow: hidden;
+  /* BẮT BUỘC PHẢI CÓ ĐỂ ANIMATION 0fr -> 1fr KHÔNG BỊ TRÀN */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-bottom: 10px;
+  transition: padding-bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* --- KHUNG TIN NHẮN GỐC (CHỈ CHỨA BACKGROUND VÀ INTERNAL PADDING) --- */
+.message-box {
+  position: relative;
+  max-width: 750px;
+  padding: 12px 20px 15px 20px;
+  /* Padding bên trong hộp chat giữ nguyên */
+  box-sizing: border-box;
+  border-radius: 60px;
+  corner-shape: squircle;
+  background: #D3E3FD;
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  cursor: default;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+/* --- ANIMATION: XUẤT HIỆN TIN NHẮN MỚI --- */
+.message-box-wrapper.message-enter {
+  grid-template-rows: 0fr !important;
+  opacity: 0 !important;
+  transform: translateY(24px) !important;
+}
+
+.message-box-wrapper.message-enter .message-grid-inner {
+  padding-bottom: 0 !important;
+}
+
+.message-box-wrapper.message-enter-active {
+  grid-template-rows: 1fr !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.message-box-wrapper.message-enter-active .message-grid-inner {
+  padding-bottom: 10px !important;
+}
+
+/* FIX TRIỆT TIÊU PADDING/BACKGROUND CỦA BOX CHỨA SKELETON ĐANG UPLOAD */
+.message-box:has(.chat-image),
+.message-box:has(.chat-video),
+.message-box:has(.chat-video-thumb),
+.message-box:has(.pending-media-wrap) {
+  padding: 0px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* --- ANIMATION KHI XÓA: TRIỆT TIÊU ĐỒNG BỘ 100% --- */
+.message-box-wrapper.message-exit {
+  grid-template-rows: 0fr !important;
+  /* Thu nhỏ chiều cao ruột về 0 */
+  opacity: 0 !important;
+}
+
+/* Khi wrapper nhận class exit, lập tức ép phần padding khoảng cách của khối inner về 0 */
+.message-box-wrapper.message-exit .message-grid-inner {
+  padding-bottom: 0 !important;
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== Nền tuyết rơi ===== */
+
+.snow-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background-size: 300% 300%;
+  animation: bg-pulse 12s ease infinite;
+  perspective: 900px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.snow-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.flake {
+  position: absolute;
+  top: 0;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.flake svg {
+  display: block;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.flake.v-a {
+  animation: fall-a var(--dur) var(--delay) ease-in-out infinite;
+}
+
+.flake.v-b {
+  animation: fall-b var(--dur) var(--delay) ease-in-out infinite;
+}
+
+.flake.v-c {
+  animation: fall-c var(--dur) var(--delay) ease-in-out infinite;
+}
+
+.flake.v-d {
+  animation: fall-d var(--dur) var(--delay) ease-in-out infinite;
+}
+
+.flake:nth-child(3n) svg {
+  animation-delay: -1s;
+}
+
+.flake:nth-child(5n) svg {
+  animation-delay: -2.5s;
+}
+
+.flake:nth-child(7n) svg {
+  animation-delay: -.5s;
+}
+
+.flake:nth-child(11n) svg {
+  animation-delay: -3.5s;
+}
+
+/* ===== Keyframes ===== */
+
+@keyframes bg-pulse {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  to {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 2px rgba(180, 220, 255, .4));
+  }
+
+  50% {
+    filter: brightness(1.4) drop-shadow(0 0 8px rgba(150, 210, 255, .9));
+  }
+
+  to {
+    filter: brightness(1) drop-shadow(0 0 2px rgba(180, 220, 255, .4));
+  }
+}
+
+@keyframes fall-a {
+  0% {
+    transform: translateY(-120px) translate(0) rotateX(0) rotateY(0) rotate(0) scale(.6);
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  20% {
+    transform: translateY(20vh) translate(30px) rotateX(180deg) rotateY(90deg) rotate(45deg) scale(.9);
+  }
+
+  40% {
+    transform: translateY(40vh) translate(-20px) rotateX(360deg) rotateY(200deg) rotate(90deg) scale(1);
+  }
+
+  60% {
+    transform: translateY(60vh) translate(40px) rotateX(540deg) rotateY(300deg) rotate(180deg) scale(.85);
+  }
+
+  80% {
+    transform: translateY(80vh) translate(-30px) rotateX(700deg) rotateY(400deg) rotate(270deg) scale(.95);
+  }
+
+  95% {
+    opacity: .6;
+  }
+
+  to {
+    transform: translateY(110vh) translate(10px) rotateX(900deg) rotateY(540deg) rotate(360deg) scale(.7);
+    opacity: 0;
+  }
+}
+
+@keyframes fall-b {
+  0% {
+    transform: translateY(-140px) translate(0) rotateX(30deg) rotateY(0) rotate(20deg) scale(.5);
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  25% {
+    transform: translateY(25vh) translate(-40px) rotateX(200deg) rotateY(120deg) rotate(60deg) scale(1.1);
+  }
+
+  50% {
+    transform: translateY(50vh) translate(50px) rotateX(400deg) rotateY(250deg) rotate(130deg) scale(.9);
+  }
+
+  75% {
+    transform: translateY(75vh) translate(-35px) rotateX(620deg) rotateY(380deg) rotate(220deg) scale(1.05);
+  }
+
+  92% {
+    opacity: .5;
+  }
+
+  to {
+    transform: translateY(115vh) translate(20px) rotateX(800deg) rotateY(500deg) rotate(300deg) scale(.6);
+    opacity: 0;
+  }
+}
+
+@keyframes fall-c {
+  0% {
+    transform: translateY(-100px) translate(0) rotateX(60deg) rotateY(30deg) rotate(10deg) scale(.8);
+    opacity: 0;
+  }
+
+  6% {
+    opacity: 1;
+  }
+
+  30% {
+    transform: translateY(30vh) translate(55px) rotateX(150deg) rotateY(180deg) rotate(80deg) scale(.75);
+  }
+
+  55% {
+    transform: translateY(55vh) translate(-45px) rotateX(320deg) rotateY(320deg) rotate(160deg) scale(1);
+  }
+
+  78% {
+    transform: translateY(78vh) translate(60px) rotateX(500deg) rotateY(450deg) rotate(250deg) scale(.85);
+  }
+
+  94% {
+    opacity: .4;
+  }
+
+  to {
+    transform: translateY(112vh) translate(-15px) rotateX(720deg) rotateY(600deg) rotate(340deg) scale(.55);
+    opacity: 0;
+  }
+}
+
+@keyframes fall-d {
+  0% {
+    transform: translateY(-90px) translate(0) rotateX(90deg) rotateY(45deg) rotate(35deg) scale(.65);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  22% {
+    transform: translateY(22vh) translate(-50px) rotateX(230deg) rotateY(150deg) rotate(70deg) scale(1);
+  }
+
+  45% {
+    transform: translateY(45vh) translate(35px) rotateX(450deg) rotateY(280deg) rotate(150deg) scale(.8);
+  }
+
+  70% {
+    transform: translateY(70vh) translate(-60px) rotateX(650deg) rotateY(420deg) rotate(240deg) scale(1.1);
+  }
+
+  90% {
+    opacity: .5;
+  }
+
+  to {
+    transform: translateY(118vh) translate(25px) rotateX(870deg) rotateY(560deg) rotate(320deg) scale(.6);
+    opacity: 0;
+  }
 }

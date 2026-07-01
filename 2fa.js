@@ -8,54 +8,47 @@ let videoStream = null;
 let toastTimeout;
 
 // --- DOM ELEMENTS ---
-const widget = document.getElementById('two-fa');
+const widget = document.getElementById('two-fa'); // Vẫn giữ element này phòng khi CSS của bạn cần
 const loginView = document.getElementById('login-view');
 const otpListView = document.getElementById('otp-list');
 const toolbar = document.getElementById('toolbar');
 const loading = document.getElementById('loading');
-const mainContent = document.getElementById('main-content');
 const scanMenu = document.getElementById('scan-menu');
 const toast = document.getElementById('toast');
 
-// --- TOGGLE LOGIC ---
-document.addEventListener('click', function (event) {
-    // Click outside -> Close
-    if (widget.classList.contains('expand') && !widget.contains(event.target)) {
-        closeWidget();
+// --- PAGE LIFECYCLE LOGIC (THAY THẾ TOGGLE LOGIC) ---
+
+// 1. Khi người dùng truy cập trang (Tải xong HTML)
+window.addEventListener('DOMContentLoaded', () => {
+    // Nếu CSS cũ của bạn dùng class 'expand' để hiện UI, hãy add nó ngay từ đầu
+    if (widget) {
+        widget.classList.add('expand');
     }
-});
 
-widget.addEventListener('click', function (e) {
-    // Click widget -> Open (nếu chưa mở)
-    if (!widget.classList.contains('expand')) {
-        openWidget();
-    }
-});
-
-function openWidget() {
-    widget.classList.add('expand');
-
-    // --- THÊM ĐOẠN NÀY ---
-    // Xóa sạch thông báo lỗi cũ (nếu có) ngay khi mở widget
+    // Xóa sạch thông báo lỗi cũ (nếu có)
     const errEl = document.getElementById('login-error');
     if (errEl) {
         errEl.style.display = 'none';
         errEl.innerText = '';
     }
-    // ---------------------
 
-    checkAutoLogin();
-    document.getElementById('scan-menu').style.display = 'none';
-}
-
-function closeWidget() {
-    widget.classList.remove('expand');
-    isEditMode = false;
     scanMenu.style.display = 'none';
-    document.getElementById('two-fa-icon').style.opacity = '1';
-}
 
-// --- LOGIC AUTH (ĐÃ SỬA: AUTO-LOGIN & KHÔNG AUTO-FILL) ---
+    // Tự động chạy luồng đăng nhập
+    checkAutoLogin();
+});
+
+// 2. Khi người dùng thoát trang (Đóng tab, F5, v.v.)
+window.addEventListener('beforeunload', () => {
+    // Dọn dẹp interval đếm ngược OTP
+    if (window.otpInterval) {
+        clearInterval(window.otpInterval);
+    }
+    // Đảm bảo luồng video camera bị tắt để không treo tài nguyên
+    stopCamera();
+});
+
+// --- LOGIC AUTH ---
 
 async function checkAutoLogin() {
     myPassword = localStorage.getItem('auth_pass') || '';
@@ -74,7 +67,6 @@ function showLogin() {
     document.getElementById('edit-btn').style.opacity = '0';
     document.getElementById('header').style.opacity = '0';
     document.getElementById('two-fa-icon').style.opacity = '0';
-    mainContent.style.overflowY = 'hidden';
 
     // Xóa mật khẩu cũ trong input
     document.getElementById('password-input').value = '';
@@ -122,7 +114,7 @@ async function fetchSecrets(isAutoLogin = false) {
         if (isAutoLogin) {
             // Nếu là Auto Login mà sai:
             // 1. Không hiện lỗi đỏ (để người dùng thấy form sạch)
-            // 2. Xóa luôn password sai trong localStorage để lần sau mở widget nó không tự check nữa
+            // 2. Xóa luôn password sai trong localStorage
             localStorage.removeItem('auth_pass');
             document.getElementById('password-input').value = '';
 
@@ -150,7 +142,6 @@ async function fetchSecrets(isAutoLogin = false) {
         loginView.style.display = 'none';
         otpListView.style.display = 'block';
         toolbar.style.display = 'grid';
-        mainContent.style.overflowY = 'auto';
         renderOTP();
         if (window.otpInterval) clearInterval(window.otpInterval);
         window.otpInterval = setInterval(renderOTP, 1000);
@@ -219,87 +210,79 @@ function renderOTP() {
 
     let html = '';
     if (secretsData && secretsData.length > 0) {
-    secretsData.forEach((item, index) => {
-        let otpCode = "ERROR";
-        try {
-            const totp = new OTPAuth.TOTP({
-                algorithm: 'SHA1', digits: 6, period: 30,
-                secret: OTPAuth.Secret.fromBase32(item.secret_key)
-            });
-            otpCode = totp.generate();
-        } catch (e) { otpCode = "INVALID"; }
+        secretsData.forEach((item, index) => {
+            let otpCode = "ERROR";
+            try {
+                const totp = new OTPAuth.TOTP({
+                    algorithm: 'SHA1', digits: 6, period: 30,
+                    secret: OTPAuth.Secret.fromBase32(item.secret_key)
+                });
+                otpCode = totp.generate();
+            } catch (e) { otpCode = "INVALID"; }
 
-        // --- XỬ LÝ ICON (SVG hoặc ẢNH) ---
-        let iconHtml = '';
-        const iconSource = item.icon_svg ? item.icon_svg.trim() : '';
-        const firstLetter = (item.service_name || '?').charAt(0).toUpperCase();
+            // --- XỬ LÝ ICON (SVG hoặc ẢNH) ---
+            let iconHtml = '';
+            const iconSource = item.icon_svg ? item.icon_svg.trim() : '';
+            const firstLetter = (item.service_name || '?').charAt(0).toUpperCase();
 
-        if (iconSource) {
-            // Kiểm tra xem là mã SVG hay Link ảnh
-            if (iconSource.startsWith('<')) {
-                // Là mã SVG (ví dụ: <svg...>)
-                iconHtml = `<div class="icon-container custom-svg">${iconSource}</div>`;
+            if (iconSource) {
+                // Kiểm tra xem là mã SVG hay Link ảnh
+                if (iconSource.startsWith('<')) {
+                    // Là mã SVG
+                    iconHtml = `<div class="icon-container custom-svg">${iconSource}</div>`;
+                } else {
+                    // Là đường dẫn ảnh
+                    iconHtml = `
+                        <div class="icon-container custom-img">
+                            <img src="${iconSource}" alt="${item.service_name}" 
+                                 onerror="this.parentElement.innerHTML='${firstLetter}'; this.parentElement.classList.remove('custom-img');">
+                        </div>`;
+                }
             } else {
-                // Là đường dẫn ảnh (ví dụ: https://... hoặc /assets/...)
-                // Thêm onerror để nếu ảnh lỗi link thì fallback về chữ cái đầu
-                iconHtml = `
-                    <div class="icon-container custom-img">
-                        <img src="${iconSource}" alt="${item.service_name}" 
-                             onerror="this.parentElement.innerHTML='${firstLetter}'; this.parentElement.classList.remove('custom-img');">
-                    </div>`;
+                // Không có icon -> dùng chữ cái đầu
+                iconHtml = `<div class="icon-container">${firstLetter}</div>`;
             }
-        } else {
-            // Không có icon -> dùng chữ cái đầu
-            iconHtml = `<div class="icon-container">${firstLetter}</div>`;
-        }
-        // ----------------------------------
+            // ----------------------------------
 
-        html += `
-            <div class="otp-item ${isEditMode ? 'show-edit' : ''}" onclick="copyCode('${otpCode}')">
-                ${iconHtml}
-                <div class="otp-info">
-                    <span class="service-name">${item.service_name || 'Unknown'}</span>
-                    <span class="otp-code">${otpCode}</span>
-                    <span class="account-name">${item.account_name || ''}</span>
-                </div>
-                <div class="pie-timer" style="--deg: ${deg}deg"></div>
-                <div class="edit-controls">
-                    <div class="move-btn" onclick="moveItem(${index}, -1)">${chevronUp}</div>
-                    <div id="delete-otp-btn" onclick="deleteSecretRPC(${item.id})">${trashIcon}</div>
-                    <div class="move-btn" onclick="moveItem(${index}, 1)">${chevronDown}</div>
-                </div>
+            html += `
+                <div class="otp-item ${isEditMode ? 'show-edit' : ''}" onclick="copyCode('${otpCode}')">
+                    ${iconHtml}
+                    <div class="otp-info">
+                        <span class="service-name">${item.service_name || 'Unknown'}</span>
+                        <span class="otp-code">${otpCode}</span>
+                        <span class="account-name">${item.account_name || ''}</span>
+                    </div>
+                    <div class="pie-timer" style="--deg: ${deg}deg"></div>
+                    <div class="edit-controls">
+                        <div class="move-btn" onclick="moveItem(${index}, -1)">${chevronUp}</div>
+                        <div id="delete-otp-btn" onclick="deleteSecretRPC(${item.id})">${trashIcon}</div>
+                        <div class="move-btn" onclick="moveItem(${index}, 1)">${chevronDown}</div>
+                    </div>
+                </div>`;
+        });
+    } else {
+        html = `
+            <div style="padding:40px 20px; text-align:center; color:#999; display:flex; flex-direction:column; align-items:center;">
+                ${ghostIcon}
+                <div>Chưa có mã nào.<br>Hãy Import hoặc Scan để bắt đầu.</div>
             </div>`;
-    });
-} else {
-    html = `
-        <div style="padding:40px 20px; text-align:center; color:#999; display:flex; flex-direction:column; align-items:center;">
-            ${ghostIcon}
-            <div>Chưa có mã nào.<br>Hãy Import hoặc Scan để bắt đầu.</div>
-        </div>`;
-}
+    }
+    
     otpListView.innerHTML = html;
     document.getElementById('header').style.opacity = '1';
     document.getElementById('two-fa-icon').style.opacity = '1';
     document.getElementById('edit-btn').style.opacity = '1';
 }
 
-// --- SCAN / EDIT MENU TOGGLES (FIXED) ---
+// --- MENU TOGGLES ---
 function toggleEditMode(e) {
     e.stopPropagation();
-    // FIX: Nếu widget chưa mở (chưa có class expand), không làm gì cả
-    if (!widget.classList.contains('expand')) return;
-
     isEditMode = !isEditMode;
     renderOTP();
 }
 
 function toggleScanMenu(e) {
     e.stopPropagation();
-    // FIX: Nếu widget chưa mở, chặn ngay lập tức.
-    // Logic: Khi click vào nút khi widget đóng, event chạy ở nút trước (do capture/bubble),
-    // lúc này widget chưa có class 'expand', nên return luôn.
-    if (!widget.classList.contains('expand')) return;
-
     const menu = document.getElementById('scan-menu');
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
 }
@@ -322,7 +305,11 @@ function handleFileImport(input) {
             line = line.trim();
             if (!line.startsWith('otpauth://')) continue;
             try {
-                // ... (giữ nguyên logic xử lý import) ...
+                // Xử lý import
+                const url = new URL(line);
+                const secret = url.searchParams.get('secret');
+                const issuer = url.searchParams.get('issuer') || '';
+                const account = decodeURIComponent(url.pathname.replace(/^\/totp\//, ''));
                 if (secret) { await addSecretRPC(line, issuer, account, secret); count++; }
             } catch (err) { console.error("Parse error", err); }
         }
@@ -407,7 +394,10 @@ async function scanScreen(e) {
 async function handleScanResult(data) {
     if (data.startsWith('otpauth://')) {
         if (confirm(`Tìm thấy mã 2FA!\nThêm vào danh sách ngay?`)) {
-            // ... (giữ nguyên logic xử lý URL) ...
+            const url = new URL(data);
+            const secret = url.searchParams.get('secret');
+            const issuer = url.searchParams.get('issuer') || '';
+            const path = decodeURIComponent(url.pathname.replace(/^\/totp\//, ''));
 
             loading.classList.add('active'); // Bật loading
 

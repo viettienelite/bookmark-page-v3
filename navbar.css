@@ -1,0 +1,108 @@
+
+:root {
+  --pill-bg: #FFFFFF;
+  --pill-accent: #2196F3;
+  /* Màu xanh chủ đạo */
+  --pill-accent-hover: #E8F4FD;
+  /* Màu nền khi hover */
+  --pill-text-muted: #65676B;
+  --pill-shadow: rgba(0, 0, 0, 0.06) 0px 4px 12px;
+}
+
+/* Container bọc ngoài để căn giữa hoặc đặt vị trí cố định */
+.tab-pill-container {
+  position: relative;
+  width: 500px;
+  margin: 0 auto;   /* thay cho left: 50%; transform: translateX(-50%); */
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 0 0;
+  view-transition-name: tab-pill-container;
+  z-index: 9999;
+}
+
+/* Thanh Pill chính */
+/* Bỏ tên trên .tab-pill — nó gây gộp icon+label+nền thành 1 ảnh, gây đúng lỗi bạn thấy */
+.tab-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--pill-bg);
+  padding: 6px;
+  border-radius: 9999px;
+  box-shadow: var(--pill-shadow);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  gap: 4px;
+  /* view-transition-name: tab-pill;  <-- xoá dòng này */
+}
+
+/* Đặt tên riêng cho từng tab-item để tách khỏi nền */
+.tab-pill .tab-item:nth-child(2) { view-transition-name: tab-item-1; }
+.tab-pill .tab-item:nth-child(3) { view-transition-name: tab-item-2; }
+.tab-pill .tab-item:nth-child(4) { view-transition-name: tab-item-3; }
+
+/* Thứ tự xếp lớp trong lúc transition: nền dưới cùng, pill giữa, icon/label trên cùng */
+::view-transition-group(root),
+::view-transition-group(tab-pill-container) {
+  z-index: 1;
+}
+
+::view-transition-group(tab-pill-indicator) {
+  z-index: 2;
+}
+
+::view-transition-group(tab-item-1),
+::view-transition-group(tab-item-2),
+::view-transition-group(tab-item-3) {
+  z-index: 3;
+}
+
+/* Các item tab con */
+/* Các phần khác giữ nguyên, chỉ cập nhật selector .tab-item */
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+
+  /* Thay đổi quan trọng cho thẻ <a> */
+  text-decoration: none;
+  /* Xóa gạch chân mặc định của link */
+  color: var(--pill-text-muted);
+  /* Giữ màu chữ chuẩn */
+
+  background: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  
+}
+
+/* Kích thước Icon */
+.tab-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+/* Trạng thái Hover (chỉ áp dụng cho các tab chưa Active) */
+.tab-item:not(.active):hover {
+  color: var(--pill-accent);
+  background-color: var(--pill-accent-hover);
+  view-transition-name: tab-item-hover;
+}
+
+/* Trạng thái Active */
+/* Đảm bảo khi active không bị đổi màu link theo mặc định trình duyệt */
+.tab-item.active {
+  color: #FFFFFF;
+}
+
+@view-transition {
+  navigation: auto;
+}

@@ -3,8 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ViệtTiến┇ᴱᴸᴬᴵ</title>
     <link rel="stylesheet" href="container.css">
-    <link rel="stylesheet" href="chat.css">
-    <link rel="stylesheet" href="2fa.css">
+    <link rel="stylesheet" href="navbar.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/streamsaver@2.0.6/StreamSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.1.2/otpauth.umd.min.js"></script>
@@ -18,182 +17,41 @@
 
     <div id="bookmark-container">
 
-        <div id="two-fa">
-            <svg id="two-fa-icon" viewBox="0 0 658 705" fill="#2196f3">
-                <path d="M329 231.5v195h-66v-195zM195 0h195v66H195z" />
-                <path
-                    d="M295.5 113.5c70.176 0 134.637 24.464 185.324 65.326l48.327-48.326 45.962 45.962-48.45 48.449a295.6 295.6 0 0 1 35.968 57.589h-75.185c-41.092-62.635-111.938-104-192.446-104-127.025 0-230 102.975-230 230s102.975 230 230 230a232 232 0 0 0 34-2.497v66.618a299 299 0 0 1-33.5 1.879C132.3 704.5 0 572.2 0 409s132.3-295.5 295.5-295.5" />
-                <path
-                    d="M527 342.5a92.003 92.003 0 0 1 92 92h-40a52 52 0 0 0-15.23-36.77 52.005 52.005 0 0 0-73.54 0A52 52 0 0 0 475 434.5v72h140c23.748 0 43 19.252 43 43v112c0 23.748-19.252 43-43 43H438c-23.748 0-43-19.252-43-43v-112c0-22.74 17.651-41.354 40-42.895V434.5a92.003 92.003 0 0 1 92-92" />
-            </svg>
-            <div id="two-fa-content">
-                <div class="header" id="header">
-                    <span class="title">
-                        Authenticator
-                    </span>
-                    <div class="header-actions" id="edit-btn">
-                        <svg onclick="toggleEditMode(event)" fill="rgba(0, 0, 0, 0.6)" viewBox="0 0 24 24">
-                            <path
-                                d="M3.25 22a.75.75 0 0 1 .75-.75h16a.75.75 0 0 1 0 1.5H4a.75.75 0 0 1-.75-.75m8.27-7.071 5.917-5.917a8.2 8.2 0 0 1-2.661-1.787 8.2 8.2 0 0 1-1.788-2.662L7.07 10.48c-.462.462-.693.692-.891.947a5.2 5.2 0 0 0-.599.969c-.139.291-.242.601-.449 1.22l-1.088 3.267a.848.848 0 0 0 1.073 1.073l3.266-1.088c.62-.207.93-.31 1.221-.45q.518-.246.969-.598c.255-.199.485-.43.947-.891m7.56-7.559a3.146 3.146 0 0 0-4.45-4.449l-.71.71.031.09c.26.749.751 1.732 1.674 2.655A7 7 0 0 0 18.37 8.08z" />
-                        </svg>
-                    </div>
-                </div>
+        <div class="tab-pill-container">
+            <nav class="tab-pill">
 
-                <div id="loading">
-                    <div class="spinner fa-spin" viewBox="0 0 512 512"></div>
-                </div>
+                <div class="tab-pill-indicator"></div>
 
-                <div class="content" id="main-content">
-                    <div id="login-view">
-                        <div class="login-icon"><svg viewBox="0 0 534 649">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M294.14 3.848a100 100 0 0 0-54.947 0L72.528 51.467C29.598 63.732 0 102.97 0 147.619v179.148c0 96.887 46.79 187.807 125.629 244.12l82.914 59.224c34.77 24.836 81.477 24.836 116.247 0l82.913-59.224c78.84-56.313 125.63-147.233 125.63-244.12V147.619c0-44.648-29.596-83.887-72.526-96.152z"
-                                    fill="#2196f3" />
-                            </svg>
-                        </div>
-                        <input type="password" id="password-input" class="pass-input" placeholder="Password">
-                        <button class="btn" onclick="login()">Login</button>
+                <a href="index.html" class="tab-item active">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="tab-label">Bookmarks</span>
+                </a>
 
-                        <div id="login-error" class="error-msg"></div>
-                    </div>
-
-                    <div id="otp-list"></div>
-                </div>
-
-                <div id="toast">Copied!</div>
-
-                <div id="camera-modal">
-                    <div class="close-cam" onclick="stopCamera()">X</div>
-                    <video id="qr-video"></video>
-                </div>
-
-                <div id="scan-menu">
-                    <div class="scan-option" onclick="startCamera()">
-                        <svg viewBox="0 0 1152 864">
-                            <path
-                                d="M664 0c101.038 0 186.021 68.737 210.739 162H934c120.4 0 218 97.602 218 218v266c0 120.398-97.6 218-218 218H218C97.602 864 0 766.398 0 646V380c0-120.398 97.602-218 218-218h59.261C301.979 68.737 386.962 0 488 0zm-88 247c-128.13 0-232 103.87-232 232s103.87 232 232 232 232-103.87 232-232-103.87-232-232-232m.663 115.337c64.065 0 116 51.935 116 116s-51.935 116-116 116-116-51.935-116-116 51.935-116 116-116" />
-                        </svg>
-                        Camera
-                    </div>
-                    <div class="scan-option" onclick="scanScreen(event)">
-
-                        <svg width="1152" height="814" viewBox="0 0 1152 814" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M967 0C1023.89 0 1070 46.1147 1070 103V602C1070 658.885 1023.89 705 967 705H1097.5C1127.6 705 1152 729.4 1152 759.5C1152 789.6 1127.6 814 1097.5 814H54.5C24.4005 814 0 789.6 0 759.5C0 729.4 24.4005 705 54.5 705H176C119.115 705 73 658.885 73 602V103C73 46.1147 119.115 0 176 0H967ZM616.955 269C461.78 269 335.673 393.453 333 547.99C388.367 467.657 481.011 415 585.955 415C596.419 415 606.761 415.524 616.955 416.546V516L809.955 337.5L616.955 159V269Z"
-                                fill="black" />
-                        </svg>
-                        Screen
-                    </div>
-                </div>
-
-                <div class="toolbar" id="toolbar">
-                    <button class="tool-btn" onclick="triggerImport()">
-                        <svg viewBox="0 0 864 864">
-                            <path d="M321 494.982 432.018 606m111-111.018L432 606m0-556v463.982" stroke="#000"
-                                stroke-width="100" stroke-linecap="round" />
-                            <path
-                                d="M228 280c27.614 0 50 22.386 50 50s-22.386 50-50 50h-6c-38.66 0-90 51.34-90 90v204c0 38.66 51.34 90 90 90h420c38.66 0 90-51.34 90-90V470c0-38.66-51.34-90-90-90h-6c-27.614 0-50-22.386-50-50s22.386-50 50-50h6c93.888 0 190 96.112 190 190v204c0 93.888-96.112 190-190 190H222c-93.888 0-190-96.112-190-190V470c0-93.888 96.112-190 190-190z" />
-                            <path
-                                d="M228 280c27.614 0 50 22.386 50 50s-22.386 50-50 50h-6c-38.66 0-90 51.34-90 90v204c0 38.66 51.34 90 90 90h420c38.66 0 90-51.34 90-90V470c0-38.66-51.34-90-90-90h-6c-27.614 0-50-22.386-50-50s22.386-50 50-50h6c93.888 0 190 96.112 190 190v204c0 93.888-96.112 190-190 190H222c-93.888 0-190-96.112-190-190V470c0-93.888 96.112-190 190-190z"
-                                stroke="#000" />
-                        </svg>
-                    </button>
-                    <button class="tool-btn" onclick="exportData()">
-                        <svg viewBox="0 0 864 864">
-                            <path d="M543.018 161.018 432 50M321 161.018 432.018 50m0 556V142.018" stroke="#000"
-                                stroke-width="100" stroke-linecap="round" />
-                            <path
-                                d="M228 280c27.614 0 50 22.386 50 50s-22.386 50-50 50h-6c-38.66 0-90 51.34-90 90v204c0 38.66 51.34 90 90 90h420c38.66 0 90-51.34 90-90V470c0-38.66-51.34-90-90-90h-6c-27.614 0-50-22.386-50-50s22.386-50 50-50h6c93.888 0 190 96.112 190 190v204c0 93.888-96.112 190-190 190H222c-93.888 0-190-96.112-190-190V470c0-93.888 96.112-190 190-190z" />
-                            <path
-                                d="M228 280c27.614 0 50 22.386 50 50s-22.386 50-50 50h-6c-38.66 0-90 51.34-90 90v204c0 38.66 51.34 90 90 90h420c38.66 0 90-51.34 90-90V470c0-38.66-51.34-90-90-90h-6c-27.614 0-50-22.386-50-50s22.386-50 50-50h6c93.888 0 190 96.112 190 190v204c0 93.888-96.112 190-190 190H222c-93.888 0-190-96.112-190-190V470c0-93.888 96.112-190 190-190z"
-                                stroke="#000" />
-                        </svg>
-                    </button>
-                    <button class="tool-btn" onclick="toggleScanMenu(event)">
-                        <svg viewBox="0 0 864 864">
-                            <rect x="200" y="200" width="127" height="127" rx="45" />
-                            <rect x="537" y="537" width="127" height="127" rx="45" />
-                            <rect x="200" y="414" width="250" height="250" rx="70" />
-                            <rect x="444" y="200" width="220" height="220" rx="70" />
-                            <path
-                                d="M100 654c0 60.751 49.249 110 110 110h63.5s50 0 50 50-50 50-50 50H210C94.02 864 0 769.98 0 654v-72s0-50 50-50 50 50 50 50zm764 0c0 115.98-94.02 210-210 210h-80.5s-50 0-50-50 50-50 50-50H654c60.751 0 110-49.249 110-110v-72s0-50 50-50 50 50 50 50zM273.5 100H210c-60.751 0-110 49.249-110 110v72s0 50-50 50-50-50-50-50v-72C0 94.02 94.02 0 210 0h63.5s50 0 50 50-50 50-50 50M654 0c115.98 0 210 94.02 210 210v72s0 50-50 50-50-50-50-50v-72c0-60.751-49.249-110-110-110h-80.5s-50 0-50-50 50-50 50-50z" />
-                        </svg>
-                    </button>
-                    <button class="tool-btn" onclick="logout()">
-                        <svg viewBox="0 0 890 856">
-                            <path d="M702.982 486.018 814 375M702.982 264 814 375.018M418 375l303.982.018" stroke="#000"
-                                stroke-width="100" stroke-linecap="round" />
-                            <path
-                                d="M177.962 0C90.022 0 0 90.105 0 178.125v393.75c0 51.616 30.957 103.949 74.298 138.408L77 714l153 130.5c5.5 4.5 8.957 6.298 15.5 8.5 7.277 2.449 11.829 2.829 19.5 2.5 10.987-.471 17.514-2.436 27-8 13.456-7.893 24.468-30.125 26.619-34.679.251-.53.381-.821.381-.821v-62h50.038C456.978 750 547 659.895 547 571.875v-5.625c0-25.888-20.968-46.875-46.832-46.875s-46.832 20.987-46.832 46.875v5.625c0 36.244-48.087 84.375-84.298 84.375H319V210c-1-14-2.448-19.275-8-30-4.851-9.37-17-20.5-17-20.5l-75.405-65.75h150.443c36.211 0 84.298 48.131 84.298 84.375v5.625c0 25.888 20.967 46.875 46.832 46.875S547 209.638 547 183.75v-5.625C547 90.105 456.978 0 369.038 0z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-        </div>
-
-        <input type="file" id="file-input" accept=".txt,.json,.csv" onchange="handleFileImport(this)">
-
-        <div id="chat">
-            <div id="chat-icon">
-                <svg viewBox="0 0 585 579" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M81.8445 13.2936C45.2224 16.9619 16.1338 45.1453 11.6859 81.6809C6.19246 126.806 0 188.078 0 235C0 281.922 6.19246 343.194 11.6859 388.319C16.1338 424.855 45.2224 453.038 81.8445 456.706C93.6802 457.892 107.19 463.912 115 474C127 489.5 122.741 555.765 122.741 555.765C123.172 574.792 145.208 585.093 160.083 573.22C160.083 573.22 253.5 482.591 285 474C316.5 465.409 432.23 463.811 503.156 456.706C539.778 453.038 568.866 424.855 573.314 388.319C578.807 343.194 585 281.922 585 235C585 188.078 578.807 126.806 573.314 81.6809C568.866 45.1453 539.778 16.9619 503.156 13.2936C445.136 7.48213 357.765 0 292.5 0C227.235 0 139.864 7.48213 81.8445 13.2936Z"
-                        fill="#4D9BFF" />
-                    <path d="M132 143H398" stroke="white" stroke-width="40" stroke-linecap="round" />
-                    <path d="M132 238H398" stroke="white" stroke-width="40" stroke-linecap="round" />
-                    <path d="M132 333H257" stroke="white" stroke-width="40" stroke-linecap="round" />
-                </svg>
-            </div>
-            <div id="stars-container">
-                <div id="stars"></div>
-                <div id="stars2"></div>
-                <div id="stars3"></div>
-            </div>
-
-            <div class="chat-content-area" id="messageList"></div>
-
-            <div id="toast-container"></div>
-
-            <div id="loading-overlay">
-                <div class="spinner"></div>
-                <div id="loading-text">Loading...</div>
-                <button id="cancel-btn">Cancel</button>
-            </div>
-
-            <div id="drag-overlay">
-                <div class="drag-content">
-                    <svg viewBox="0 0 24 24" width="60" height="60" fill="white">
+                <a href="2fa.html" class="tab-item">
+                    <svg class="tab-icon" viewBox="0 0 658 705" fill="currentColor">
+                        <path d="M329 231.5v195h-66v-195zM195 0h195v66H195z" />
                         <path
-                            d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                    </svg>
-                    <h3>Drop file to send</h3>
-                </div>
-            </div>
-
-            <div class="chat-toolbar">
-                <button class="btn-icon" onclick="document.getElementById('fileInput').click()">
-                    <svg viewBox="15 15 70 70">
-                        <rect x="45" y="30" width="10" height="40" rx="4" ry="4" fill="#fff" />
-                        <rect x="30" y="45" width="40" height="10" rx="4" ry="4" fill="#fff" />
-                    </svg>
-                </button>
-                <input type="file" id="fileInput" multiple onchange="handleInputFiles(this)" style="display: none;">
-
-                <div class="text-area">
-                    <textarea class="text-input" id="textInput" placeholder="Nhập tin nhắn..." rows="1"
-                        oninput="autoResize(this)" onkeydown="handleEnter(event)"></textarea>
-                </div>
-
-                <button class="btn-icon" onclick="sendText()">
-                    <svg id="send" viewBox="5 0 190 190">
+                            d="M295.5 113.5c70.176 0 134.637 24.464 185.324 65.326l48.327-48.326 45.962 45.962-48.45 48.449a295.6 295.6 0 0 1 35.968 57.589h-75.185c-41.092-62.635-111.938-104-192.446-104-127.025 0-230 102.975-230 230s102.975 230 230 230a232 232 0 0 0 34-2.497v66.618a299 299 0 0 1-33.5 1.879C132.3 704.5 0 572.2 0 409s132.3-295.5 295.5-295.5" />
                         <path
-                            d="M40,40 C35,50 35,50 45,85 Q50,90 80,93 A7,7 0 0 1 80,107 Q50,110 45,115 C35,150 35,150 40,160 Q45,170 60,163 L160,110 Q170,105 170,100 Q170,95 160,90 L60,37 Q45,30 40,40Z"
-                            fill="#fff" />
+                            d="M527 342.5a92.003 92.003 0 0 1 92 92h-40a52 52 0 0 0-15.23-36.77 52.005 52.005 0 0 0-73.54 0A52 52 0 0 0 475 434.5v72h140c23.748 0 43 19.252 43 43v112c0 23.748-19.252 43-43 43H438c-23.748 0-43-19.252-43-43v-112c0-22.74 17.651-41.354 40-42.895V434.5a92.003 92.003 0 0 1 92-92" />
                     </svg>
-                </button>
-            </div>
+                    <span class="tab-label">Authenticator</span>
+                </a>
+
+                <a href="tsaritsa.html" class="tab-item">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <span class="tab-label">Tsaritsa</span>
+                </a>
+
+            </nav>
         </div>
 
         <div class="container" id="container-1">
@@ -1020,8 +878,7 @@
 
     <script src="folder.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tus-js-client@3.0.0/dist/tus.min.js"></script>
-    <script src="chat.js"></script>
-    <script src="2fa.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tus-js-client/4.1.0/tus.min.js"></script>
 </body>
 
 
