@@ -9,6 +9,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.1.2/otpauth.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      // Đăng ký NGAY LẬP TỨC, trước khi bất kỳ script nặng nào kịp chặn parser
+      addEventListener('pageswap', (e) => {
+        if (e.viewTransition) {
+          const s = document.getElementById('snowScene');
+          if (s) s.style.display = 'none';
+        }
+      });
+      addEventListener('pagereveal', (e) => {
+        const reveal = () => {
+          const s = document.getElementById('snowScene');
+          if (s) s.style.display = '';
+        };
+        if (e.viewTransition) {
+          e.viewTransition.finished.finally(reveal);
+        } else {
+          reveal();
+        }
+      });
+    </script>
 </head>
 
 <body>
@@ -97,9 +117,8 @@
         </div>
     </div>
 
-    <div class="snow-scene" id="snowScene" aria-hidden="true"></div>
+    <div class="snow-scene" id="snowScene" style="display:none;" aria-hidden="true"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/tus-js-client@3.0.0/dist/tus.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tus-js-client/4.1.0/tus.min.js"></script>
     <script src="chat.js"></script>
 </body>

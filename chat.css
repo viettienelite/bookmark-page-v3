@@ -1,13 +1,66 @@
 body {
   position: relative;
   margin: 0;
-  background-color: #F0F4F9;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #eaf6ff;
   font-family: "Rubik", sans-serif;
   z-index: 0;
-  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.85) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-size: 55% 55%, 60% 60%, 45% 45%, 65% 65%, 40% 40%;
+  background-position:
+    10% 10%, 80% 15%, 35% 70%, 90% 80%, 15% 90%;
+  filter: blur(55px);
+  animation: blobMove1 9s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -2;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 70%);
+  background-repeat: no-repeat;
+  background-size: 50% 50%, 55% 55%, 42% 42%, 60% 60%;
+  background-position:
+    70% 10%, 20% 55%, 85% 65%, 45% 90%;
+  filter: blur(65px);
+  animation: blobMove2 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes blobMove1 {
+  0%   { background-position: 10% 10%, 80% 15%, 35% 70%, 90% 80%, 15% 90%; }
+  25%  { background-position: 40% 30%, 55% 60%, 10% 40%, 65% 35%, 45% 65%; }
+  50%  { background-position: 70% 60%, 20% 80%, 60% 15%, 30% 90%, 80% 20%; }
+  75%  { background-position: 25% 85%, 65% 20%, 85% 55%, 10% 45%, 50% 10%; }
+  100% { background-position: 10% 10%, 80% 15%, 35% 70%, 90% 80%, 15% 90%; }
+}
+
+@keyframes blobMove2 {
+  0%   { background-position: 70% 10%, 20% 55%, 85% 65%, 45% 90%; }
+  30%  { background-position: 30% 45%, 60% 20%, 40% 30%, 80% 55%; }
+  60%  { background-position: 85% 75%, 10% 15%, 65% 85%, 20% 25%; }
+  100% { background-position: 70% 10%, 20% 55%, 85% 65%, 45% 90%; }
 }
 
 .tab-pill-indicator {
@@ -32,7 +85,6 @@ body {
   width: 100vw;
   height: calc(100vh - 90px);
   z-index: 1;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -43,11 +95,11 @@ body {
 #chat::before {
   content: '';
   position: absolute;
-  top: 0;
+  top: -90px;
   left: 0;
   right: 0;
-  height: 50px;
-  background: linear-gradient(to bottom, #f0f4f9 0%, rgba(0, 0, 0, 0) 100%);
+  height: 140px;
+  background: linear-gradient(to bottom, #eaf6ff 90px, rgba(0, 0, 0, 0) 100%);
   pointer-events: none;
   z-index: 25;
 }
@@ -94,11 +146,11 @@ body {
 .chat-content-area::before {
   content: '';
   position: absolute;
-  bottom: 84px;
+  bottom: 0px;
   left: 0;
   right: 0;
-  height: 50px;
-  background: linear-gradient(to top, #F0F4F9 0%, rgba(0, 0, 0, 0) 100%);
+  height: 134px;
+  background: linear-gradient(to top, #eaf6ff 84px, rgba(0, 0, 0, 0) 100%);
   pointer-events: none;
   z-index: 25;
 }
@@ -120,6 +172,7 @@ body {
   align-items: flex-end;
   gap: 20px;
   background: #ffffff;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 12px;
   border-radius: 30px;
   z-index: 30;
   transition: all 0.3s ease;
@@ -256,10 +309,6 @@ body {
   margin: 0;
   padding-left: 15px;
   font-style: italic;
-}
-
-.message-box:hover {
-  background: rgba(44, 126, 234, 0.5);
 }
 
 .btn-icon {
@@ -550,7 +599,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255, 255, 255, 1);
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -927,7 +976,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding-bottom: 10px;
+  padding: 0px 0px 10px 0px;
   transition: padding-bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -946,6 +995,10 @@ body {
   word-wrap: break-word;
   cursor: default;
   transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.message-box:hover {
+  background: rgba(44, 126, 234, 0.5);
 }
 
 /* --- ANIMATION: XUẤT HIỆN TIN NHẮN MỚI --- */
@@ -1072,7 +1125,6 @@ body {
   position: absolute;
   top: 0;
   transform-style: preserve-3d;
-  will-change: transform, opacity;
   cursor: default;
   -webkit-user-select: none;
   user-select: none;
@@ -1276,3 +1328,4 @@ body {
     opacity: 0;
   }
 }
+

@@ -16,6 +16,7 @@ async function loadChatData() {
         showToast("Không thể kết nối server!");
     } finally {
         toggleLoading(false);
+        document.dispatchEvent(new Event('chat:ready'));
     }
 }
 
@@ -287,7 +288,7 @@ async function fetchMessages() {
     }
     hasMoreOlderMessages = (data || []).length === PAGE_SIZE;
 
-    renderInitialList(items);
+    await renderInitialList(items);
 }
 
 // Cuộn lên đỉnh: kéo thêm 1 trang tin nhắn cũ hơn mốc đang có
@@ -484,7 +485,7 @@ function scrollChatToBottom() {
 }
 
 // Render lần đầu (load chat hoặc reload toàn bộ danh sách hiện có)
-function renderInitialList(items) {
+async function renderInitialList(items) {
     const listDiv = document.getElementById('messageList');
     if (!listDiv) return;
 
@@ -497,9 +498,8 @@ function renderInitialList(items) {
         renderedMessageIds.add(item.id);
     });
 
-    waitForMediaReady(listDiv, 6000).then(() => {
-        listDiv.scrollTop = listDiv.scrollHeight;
-    });
+    await waitForMediaReady(listDiv, 6000);   // thêm await
+    listDiv.scrollTop = listDiv.scrollHeight;
 }
 
 // Thêm 1 tin nhắn mới vào cuối danh sách (realtime INSERT), có animation trượt lên + fade in.
@@ -1523,5 +1523,25 @@ if (!isChatLoaded) {
     scene.appendChild(fragment);
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  // Đợi chat tải + cuộn xong rồi mới build tuyết, tránh giành CPU với lúc fetch tin nhắn
+document.addEventListener("chat:ready", init, { once: true });
 })();
+
+function hideSnowNow() {
+  const snow = document.getElementById('snowScene');
+  if (snow) snow.style.display = 'none';
+}
+
+// Đường chính: user bấm vào 1 trong 3 tab
+document.querySelectorAll('.tab-item').forEach(link => {
+  link.addEventListener('click', hideSnowNow);
+});
+
+window.addEventListener('load', () => {
+  const snow = document.getElementById('snowScene');
+  // Nếu vì lý do gì đó (miss event, browser không hỗ trợ...) mà vẫn đang ẩn
+  // thì sau khi trang load xong hoàn toàn, cứ hiện lại, không để mất vĩnh viễn
+  if (snow && snow.style.display === 'none') {
+    snow.style.display = '';
+  }
+});
