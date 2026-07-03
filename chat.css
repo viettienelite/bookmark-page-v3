@@ -376,10 +376,8 @@ body::after {
 
 .chat-image,
 .chat-video {
-  max-width: 350px;
+  max-width: 750px;
   max-height: 200px;
-  border-radius: 50px;
-  corner-shape: squircle;
   display: block;
 }
 
@@ -388,10 +386,8 @@ body::after {
    Video full quality thật sự chỉ được nạp khi mở Lightbox. */
 .chat-video-thumb {
   position: relative;
-  width: 260px;
-  height: 170px;
-  max-width: 350px;
-  max-height: 200px;
+  width: 200px;
+  height: 200px;
   border-radius: 50px;
   corner-shape: squircle;
   background: linear-gradient(135deg, #4a4a4a, #232323);
@@ -408,23 +404,15 @@ body::after {
   background-position: center;
 }
 
-/* Phủ tối nhẹ lên poster để icon Play luôn rõ, không lẫn vào ảnh nền sáng màu */
-.chat-video-thumb.has-poster::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.25);
-}
-
 .chat-video-thumb:hover {
-  transform: scale(1.02);
+  transform: scale(1.05);
 }
 
 .video-play-icon {
   position: relative;
   z-index: 1;
-  width: 56px;
-  height: 56px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
@@ -444,7 +432,6 @@ body::after {
   display: flex;
   align-items: center;
   gap: 12px;
-  text-decoration: none;
 }
 
 .file-icon {
@@ -508,7 +495,7 @@ body::after {
   flex-shrink: 0;
   opacity: 0;
   pointer-events: none;
-  transition: all 0.9s ease;
+  transition: all 0.3s ease;
 }
 
 .message-row:hover .message-actions {
@@ -532,8 +519,8 @@ body::after {
 }
 
 .action-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
@@ -568,11 +555,11 @@ body::after {
 /* --- TOAST NOTIFICATION --- */
 #toast-container {
   position: fixed;
-  bottom: 30px;
+  bottom: 35px;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
   /* Đẩy xuống một chút để trồi lên */
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #2C7EEA;
   color: white;
   padding: 10px 24px;
   border-radius: 30px;
@@ -608,7 +595,7 @@ body::after {
   gap: 30px;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 #loading-overlay.active {
@@ -687,16 +674,16 @@ body::after {
 /* Drag Overlay Style */
 #drag-overlay {
   position: absolute;
-  top: 0;
+  top: -90px;
   left: 0;
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
   z-index: 999;
   display: none;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(20px);
 }
 
 #drag-overlay.active {
@@ -724,15 +711,15 @@ body::after {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.9);
-  z-index: 9999;
+  z-index: 9;
   /* Đảm bảo nằm trên mọi layer khác */
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  backdrop-filter: blur(8px);
+  transition: all 0.5s ease;
+  backdrop-filter: blur(20px);
 }
 
 .lightbox-overlay.active {
@@ -742,12 +729,12 @@ body::after {
 
 .lightbox-content {
   max-width: 90%;
-  max-height: 85%;
+  max-height: 90%;
   display: flex;
   justify-content: center;
   align-items: center;
   transform: scale(0.9);
-  transition: transform 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .lightbox-overlay.active .lightbox-content {
@@ -759,21 +746,19 @@ body::after {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .lightbox-close {
   position: absolute;
-  top: 20px;
-  right: 30px;
+  top: 0px;
+  right: 5px;
   background: transparent;
   border: none;
   color: white;
-  font-size: 45px;
+  font-size: 80px;
   cursor: pointer;
   opacity: 0.7;
-  transition: opacity 0.2s, transform 0.2s;
+  transition: all 0.2s;
   line-height: 1;
   z-index: 10000;
 }
@@ -787,13 +772,12 @@ body::after {
 .chat-image,
 .chat-video {
   cursor: zoom-in;
-  /* Đổi icon chuột thành kính lúp cộng để user biết là click phóng to được */
   transition: transform 0.2s ease;
 }
 
 .chat-image:hover,
 .chat-video:hover {
-  transform: scale(1.02);
+  transform: scale(1.05);
   /* Hiệu ứng nổi nhẹ khi di chuột vào thumbnail */
 }
 
@@ -837,10 +821,8 @@ body::after {
 
 /* Skeleton dùng khi chưa có bất kỳ frame/preview nào (vd video vừa mới chọn, chưa trích khung hình) */
 .upload-skeleton {
-  width: 260px;
-  height: 170px;
-  max-width: 350px;
-  max-height: 200px;
+  width: 200px;
+  height: 200px;
   background: linear-gradient(100deg, #dde5f3 30%, #eef1f6 45%, #dde5f3 60%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s ease-in-out infinite;
@@ -858,10 +840,8 @@ body::after {
 
 /* Poster video thật đã trích được (thay cho skeleton), vẫn giữ đúng kích thước khung */
 .pending-video-poster {
-  width: 260px;
-  height: 170px;
-  max-width: 350px;
-  max-height: 200px;
+  width: 200px;
+  height: 200px;
   background-size: cover;
   background-position: center;
 }
@@ -929,13 +909,13 @@ body::after {
 .upload-cancel-btn svg {
   fill: #ffffff;
   /* Đè lại luật màu chữ đen của message-box */
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   transition: fill 0.2s ease;
 }
 
 .upload-cancel-btn:hover {
-  transform: translate(-50%, -50%) scale(1.15);
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .upload-cancel-btn:hover svg {
@@ -946,7 +926,7 @@ body::after {
    vị trí icon file (icon file thật KHÔNG hiển thị trong lúc đang upload) */
 .chat-file.pending {
   position: relative;
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .file-icon-uploading {
@@ -1095,12 +1075,6 @@ body::after {
 
 
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 /* ===== Nền tuyết rơi ===== */
 
 .snow-scene {
@@ -1108,9 +1082,8 @@ body::after {
   inset: 0;
   overflow: hidden;
   background-size: 300% 300%;
-  animation: bg-pulse 12s ease infinite;
   perspective: 900px;
-  z-index: 2;
+  z-index: 30;
   pointer-events: none;
 }
 
@@ -1165,22 +1138,6 @@ body::after {
 
 .flake:nth-child(11n) svg {
   animation-delay: -3.5s;
-}
-
-/* ===== Keyframes ===== */
-
-@keyframes bg-pulse {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  to {
-    background-position: 0% 50%;
-  }
 }
 
 @keyframes shimmer {
