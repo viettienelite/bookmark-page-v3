@@ -710,8 +710,7 @@ body::after {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 9;
+  z-index: 400;
   /* Đảm bảo nằm trên mọi layer khác */
   display: flex;
   justify-content: center;
@@ -719,7 +718,6 @@ body::after {
   opacity: 0;
   visibility: hidden;
   transition: all 0.5s ease;
-  backdrop-filter: blur(20px);
 }
 
 .lightbox-overlay.active {
@@ -1081,10 +1079,15 @@ body::after {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background-size: 300% 300%;
-  perspective: 900px;
-  z-index: 30;
+  z-index: 300;
   pointer-events: none;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.snow-scene.lightbox-active {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .snow-scene::before {
@@ -1285,4 +1288,3 @@ body::after {
     opacity: 0;
   }
 }
-

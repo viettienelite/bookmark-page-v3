@@ -66,7 +66,6 @@ function showLogin() {
     toolbar.style.display = 'none';
     document.getElementById('edit-btn').style.opacity = '0';
     document.getElementById('header').style.opacity = '0';
-    document.getElementById('two-fa-icon').style.opacity = '0';
 
     // Xóa mật khẩu cũ trong input
     document.getElementById('password-input').value = '';
@@ -144,7 +143,7 @@ async function fetchSecrets(isAutoLogin = false) {
         toolbar.style.display = 'grid';
         renderOTP();
         if (window.otpInterval) clearInterval(window.otpInterval);
-        window.otpInterval = setInterval(renderOTP, 1000);
+        window.otpInterval = setInterval(tickUpdate, 1000);
     }
 }
 
@@ -196,10 +195,44 @@ function copyCode(code) {
     });
 }
 
+// Cập nhật nhẹ mỗi giây: chỉ đổi mã OTP + góc pie-timer trên các node đã có sẵn,
+// KHÔNG rebuild lại toàn bộ innerHTML -> không giật, không mất hover/edit state.
+// Pie-timer không có transition nên góc nhảy ngay lập tức, thấy rõ từng giây.
+function tickUpdate() {
+    if (loginView.style.display === 'flex') return;
+    if (!secretsData || secretsData.length === 0) return;
+
+    const epoch = Math.floor(Date.now() / 1000);
+    const countDown = 30 - (epoch % 30);
+    const deg = (countDown / 30) * 360;
+
+    const items = otpListView.querySelectorAll('.otp-item');
+    items.forEach((el, index) => {
+        const item = secretsData[index];
+        if (!item) return;
+
+        try {
+            const totp = new OTPAuth.TOTP({
+                algorithm: 'SHA1', digits: 6, period: 30,
+                secret: OTPAuth.Secret.fromBase32(item.secret_key)
+            });
+            const code = totp.generate();
+            const codeEl = el.querySelector('.otp-code');
+            if (codeEl) codeEl.innerText = code;
+        } catch (e) {
+            const codeEl = el.querySelector('.otp-code');
+            if (codeEl) codeEl.innerText = 'INVALID';
+        }
+
+        const pieEl = el.querySelector('.pie-timer');
+        if (pieEl) pieEl.style.setProperty('--deg', deg + 'deg');
+    });
+}
+
 function renderOTP() {
     if (loginView.style.display === 'flex') return;
 
-    const epoch = Math.round(new Date().getTime() / 1000.0);
+    const epoch = Math.floor(new Date().getTime() / 1000.0);
     const countDown = 30 - (epoch % 30);
     const deg = (countDown / 30) * 360;
 
@@ -270,7 +303,6 @@ function renderOTP() {
     
     otpListView.innerHTML = html;
     document.getElementById('header').style.opacity = '1';
-    document.getElementById('two-fa-icon').style.opacity = '1';
     document.getElementById('edit-btn').style.opacity = '1';
 }
 

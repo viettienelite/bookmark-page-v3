@@ -6,7 +6,7 @@
 body {
   position: relative;
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
   margin: 0;
   box-sizing: border-box;
   background-color: #F0F4F9;
@@ -17,7 +17,7 @@ body {
   justify-content: flex-start;
   font-family: 'Rubik', sans-serif;
   z-index: 0;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .tab-pill-indicator {
@@ -191,6 +191,10 @@ input.pass-input:focus {
     overflow-y: auto;
 }
 
+#otp-list::-webkit-scrollbar {
+    display: none;
+}
+
 .otp-item {
     position: relative;
     height: 70px;
@@ -268,7 +272,7 @@ input.pass-input:focus {
 /* Pie Timer */
 .pie-timer {
     position: relative;
-    right: -265px;
+    right: -275px;
     width: 26px;
     height: 26px;
     border-radius: 50%;
